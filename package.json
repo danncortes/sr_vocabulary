@@ -1,0 +1,41 @@
+{
+    "name": "sr-vocabulary",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "vite-node --watch ./src/app.ts",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint 'src/**/*.{js,ts,tsx}'",
+        "lint:fix": "eslint 'src/**/*.{js,ts,tsx}' --fix"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@inquirer/prompts": "^7.3.2",
+        "child_process": "^1.0.2",
+        "dotenv": "^16.4.7",
+        "fs": "^0.0.1-security",
+        "mysql2": "^3.12.0",
+        "play-sound": "^1.1.6",
+        "promises": "^0.2.5",
+        "terminal-kit": "^3.1.2",
+        "tmp-promise": "^3.0.3",
+        "vite-node": "^3.0.6"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.20.0",
+        "@types/inquirer": "^9.0.7",
+        "@types/node": "^22.13.4",
+        "@types/play-sound": "^1.1.2",
+        "@types/terminal-kit": "^2.5.7",
+        "eslint": "^9.20.1",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-prettier": "^5.2.3",
+        "globals": "^15.15.0",
+        "prettier": "^3.5.1",
+        "typescript-eslint": "^8.24.1"
+    }
+}
