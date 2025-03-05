@@ -1,8 +1,8 @@
 import { select } from '@inquirer/prompts';
-import reviewVocabulary from './review-vocabulary';
-import saveTranslatedPhrasesFromJson from '../../utils/save-phrases-from-json';
-import store from '../../data/store';
-import newVocabularyToLearn from './new-vocabulary-to-learn';
+import reviewVocabulary from '../review-vocabulary';
+import saveTranslatedPhrasesFromJson from '../../../utils/save-phrases-from-json';
+import store from '../../../data/store';
+import newVocabularyToLearn from '../new-vocabulary-to-learn';
 import { terminal } from 'terminal-kit';
 
 export async function showMainMenu() {
@@ -13,7 +13,7 @@ export async function showMainMenu() {
         { name: 'Add new', value: 3 },
         { name: 'Delay all', value: 4 },
         { name: 'Load Phrases from JSON', value: 5 },
-        { name: 'Exit', value: 6 }
+        { name: 'Exit \n', value: 6 }
     ];
 
     const answer = await select({

@@ -9,6 +9,7 @@ const db = mysql.createPool({
     user: DB_USER,
     password: DB_PASSWORD,
     database: DB,
+    dateStrings: true
 });
 
 db.getConnection()

@@ -7,7 +7,7 @@ import {
     setVocabularyAsLearnedToday
 } from '../commands/general';
 
-export async function vocabularyOptions() {
+export async function vocabularyOptions(defaultChoiceIndex?: number) {
     const choices = [
         { name: 'Play', value: 0, description: 'Play phrase audio \n' },
         { name: 'Reveal translation', value: 1 },
@@ -47,9 +47,13 @@ export async function vocabularyOptions() {
         new Separator()
     ];
 
+    const defaultIndex =
+        defaultChoiceIndex !== undefined ? defaultChoiceIndex : null;
+
     const answer = await select({
         message: 'What would you like to do?',
-        choices
+        choices,
+        default: defaultIndex
     });
 
     switch (answer) {
@@ -60,11 +64,11 @@ export async function vocabularyOptions() {
         case 1:
             revealTranslation();
             playTranslatedPhrase();
-            vocabularyOptions();
+            vocabularyOptions(1);
             break;
         case 2:
             playTranslatedPhrase();
-            vocabularyOptions();
+            vocabularyOptions(2);
             break;
         case 3:
             setVocabularyAsLearnedToday();

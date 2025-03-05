@@ -28,7 +28,7 @@ export function addDaysToDate(date: string, days: number): string {
 
 export function getNextDateByDay(targetDay: string): string {
     const today = new Date();
-    const weekDays = {
+    const weekDays: { [key: string]: number } = {
         Sunday: 0,
         Monday: 1,
         Tuesday: 2,
@@ -50,4 +50,20 @@ export function getNextDateByDay(targetDay: string): string {
     const day = String(nextTargetDate.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+}
+
+export function getFormatedDate(date: string) {
+    return new Date(date).toISOString().split('T')[0];
+}
+
+export function isDateLessThanToday(date: string) {
+    const today = new Date();
+    const dateObj = new Date(date);
+    return dateObj < today;
+}
+
+export function isDateLessOrEqualThanToday(date: string) {
+    const today = new Date();
+    const dateObj = new Date(date);
+    return dateObj <= today;
 }

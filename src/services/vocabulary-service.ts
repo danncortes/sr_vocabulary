@@ -1,7 +1,6 @@
 import {
     queryNewVocabularyToLearn,
-    queryReviewVocabulary,
-    queryVocabularyDoneToday,
+    queryVocabularyToReview,
     queryVocabularyLearnedToday,
     storePhrase,
     storePhraseTranslations,
@@ -11,12 +10,17 @@ import { Phrase, PhraseTranslations, Vocabulary } from '../types';
 import { terminal } from 'terminal-kit';
 import store from '../data/store';
 import { ResultSetHeader } from 'mysql2';
-import { addDaysToDate, getNextDateByDay, getTodaysDay } from '../utils/dates';
-import { goBack } from '../cli/commands/general';
+import {
+    addDaysToDate,
+    getFormatedDate,
+    getNextDateByDay,
+    getTodaysDay,
+    isDateLessOrEqualThanToday
+} from '../utils/dates';
 
-export const getReviewVocabulary = async () => {
+export const getVocabularyToReview = async () => {
     try {
-        const vocabulary = (await queryReviewVocabulary()) as Vocabulary[];
+        const vocabulary = (await queryVocabularyToReview()) as Vocabulary[];
         store.set('vocabulary', vocabulary);
         return vocabulary;
     } catch (err) {
@@ -73,58 +77,58 @@ export async function getLearnedVocabularyToday() {
     }
 }
 
-export async function markVocabularyAsLearnedToday() {
+export async function markVocabularyAsLearnedToday(): Promise<
+    Partial<PhraseTranslations>
+> {
     try {
         const settings = store.get('settings');
         const { daysToLearn, daysToReview } = settings;
-        const selectedVocabulary = store.getSelectedVocabulary();
+        const selectedVocabulary = store.getSelectedVocabulary()!;
 
-        if (selectedVocabulary) {
-            const todaysDay = getTodaysDay();
+        const todaysDay = getTodaysDay();
 
-            const nextStage = store
-                .get('stages')
-                .find((stage) => stage.id === selectedVocabulary.stageId + 1);
+        const nextStage = store
+            .get('stages')
+            .find((stage) => stage.id === selectedVocabulary.stageId + 1);
 
-            let today = new Date().toISOString().split('T')[0];
-            today = selectedVocabulary.reviewDate || today;
+        const newStageId = selectedVocabulary.stageId + 1;
+        let today = new Date().toISOString().split('T')[0];
+        //today = selectedVocabulary.reviewDate || today;
 
-            if (
-                (selectedVocabulary.stageId === 0 &&
-                    daysToLearn.includes(todaysDay)) ||
-                (selectedVocabulary.stageId > 0 &&
-                    daysToReview.includes(todaysDay))
-            ) {
-                if (nextStage) {
-                    const newDate = addDaysToDate(today, nextStage.days);
+        let newReviewDate: string | null;
 
-                    const newStageId = selectedVocabulary.stageId + 1;
-
-                    const updatedPhraseTranslation: Partial<PhraseTranslations> =
-                        {
-                            id: selectedVocabulary.id,
-                            learned: newStageId === 6 ? 1 : 0,
-                            sr_stage_id: newStageId === 6 ? null : newStageId,
-                            review_date: newDate
-                        };
-
-                    await updatePhraseTranslation(updatedPhraseTranslation);
-                    return updatedPhraseTranslation;
-                }
-            } else {
-                let newDate: null | string = null;
-                if (todaysDay === 'Thursday') {
-                    newDate = getNextDateByDay(todaysDay);
-                } else {
-                    newDate = getNextDateByDay('Wednesday');
-                }
-                console.log(
-                    '🚀 ~ markVocabularyAsLearnedToday ~ newDate:',
-                    newDate
-                );
+        if (
+            (selectedVocabulary.stageId === 0 &&
+                daysToLearn.includes(todaysDay)) ||
+            (selectedVocabulary.reviewDate !== null &&
+                isDateLessOrEqualThanToday(selectedVocabulary.reviewDate) &&
+                daysToReview.includes(todaysDay))
+        ) {
+            if (nextStage) {
+                newReviewDate = addDaysToDate(today, nextStage.days);
             }
+        } else {
+            let reviewDate: string;
+            // If its a new Vocabulary and it is not time to learn it yet
+            if (selectedVocabulary.stageId === 0) {
+                reviewDate = getNextDateByDay(daysToLearn[0]);
+            } else {
+                // This is a vocabulary to be reviewed in the future
+                reviewDate = getNextDateByDay(daysToReview[0]);
+            }
+
+            newReviewDate = addDaysToDate(reviewDate, nextStage!.days);
         }
+
+        const updatedPhraseTranslation: Partial<PhraseTranslations> = {
+            id: selectedVocabulary.id,
+            learned: newStageId === 6 ? 1 : 0,
+            sr_stage_id: newStageId === 6 ? null : newStageId,
+            review_date: newReviewDate!
+        };
+        await updatePhraseTranslation(updatedPhraseTranslation);
+        return updatedPhraseTranslation;
     } catch (error) {
-        terminal.red(error);
+        throw error;
     }
 }

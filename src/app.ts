@@ -1,7 +1,7 @@
-import { showMainMenu } from './cli/menus/main';
+import { showMainMenu } from './cli/menus/main/main';
 import { terminal } from 'terminal-kit';
 
-async function run() {
+export async function run() {
     terminal.clear();
     showMainMenu();
 }

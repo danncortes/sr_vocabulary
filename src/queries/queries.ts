@@ -1,17 +1,22 @@
 import db from '../config/database';
 import { Phrase, PhraseTranslations } from '../types';
 
-export const queryReviewVocabulary = async () => {
+export const queryVocabularyToReview = async () => {
     const query = `
                 SELECT 
                     t.id AS id,
                     p1.text AS phrase,
                     p2.text AS translation,
-                    t.sr_stage_id,
-                    t.review_date
+                    t.sr_stage_id AS stageId,
+                    t.review_date AS reviewDate,
+                    p1.audio AS phraseAudio,
+                    p2.audio AS translationAudio
                     FROM phrase_translations t
                     JOIN phrases p1 ON t.phrase_id = p1.id
-                    JOIN phrases p2 ON t.translated_phrase_id = p2.id;
+                    JOIN phrases p2 ON t.translated_phrase_id = p2.id
+                    WHERE DATE(t.review_date) <= CURDATE()
+                    AND t.learned = 0
+                    AND t.sr_stage_id > 0
             `;
 
     const [row] = await db.query(query);

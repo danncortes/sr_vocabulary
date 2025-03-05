@@ -14,6 +14,6 @@ export default async function playMp3(blob: Buffer) {
         await execPromise(`ffplay -nodisp -autoexit "${path}"`); // ffplay
         // await execPromise(`mpg123 "${path}"`); // Alternative: mpg123
     } catch (error) {
-        console.error('Error playing MP3:', error.message);
+        console.error('Error playing MP3:', error);
     }
 }
